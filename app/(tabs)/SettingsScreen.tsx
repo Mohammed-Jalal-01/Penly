@@ -22,13 +22,13 @@ import {
   Palette,
   Menu
 } from 'lucide-react-native';
+import { router } from 'expo-router';
 
-// Define props interface for screen components
-interface ScreenProps {
-  onMenuPress?: () => void;
+interface SettingsScreenProps {
+  onMenuPress: () => void;
 }
 
-export default function SettingsScreen({ onMenuPress }: ScreenProps) {
+export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
   const [darkMode, setDarkMode] = React.useState(true);
   const [notifications, setNotifications] = React.useState(true);
 
@@ -120,24 +120,14 @@ export default function SettingsScreen({ onMenuPress }: ScreenProps) {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
-            <Menu size={24} color="#E5E7EB" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Settings</Text>
-        </View>
+        <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
+          <Menu size={24} color="#E5E7EB" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Settings</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Section */}
-        <SettingSection title="Profile">
-          <SettingItem
-            icon={<User size={20} color="#8B5CF6" />}
-            title="Account"
-            subtitle="Manage your profile and preferences"
-            onPress={() => Alert.alert('Account', 'Account settings coming soon!')}
-          />
-        </SettingSection>
+
 
         {/* Preferences Section */}
         <SettingSection title="Preferences">
@@ -173,7 +163,7 @@ export default function SettingsScreen({ onMenuPress }: ScreenProps) {
             icon={<Palette size={20} color="#EC4899" />}
             title="Theme"
             subtitle="Customize app appearance"
-            onPress={() => Alert.alert('Theme', 'Theme customization coming soon!')}
+            onPress={() => router.push('/(tabs)/theme')}
           />
         </SettingSection>
 
@@ -222,7 +212,7 @@ export default function SettingsScreen({ onMenuPress }: ScreenProps) {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-          Made By Mohammed.J
+            Made with ❤️ using React Native
           </Text>
           <Text style={styles.footerSubtext}>
             Your notes are stored locally on your device
@@ -239,17 +229,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#111827',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#111827',
     borderBottomWidth: 1,
     borderBottomColor: '#374151',
   },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   menuButton: {
+    padding: 8,
     marginRight: 12,
   },
   title: {

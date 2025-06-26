@@ -6,7 +6,9 @@ import {
   BackHandler,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Redirect } from 'expo-router';
 import Sidebar from '@/components/Sidebar';
+// Import screen components directly
 import NotesScreen from '@/app/(tabs)/index';
 import SearchScreen from '@/app/(tabs)/SearchScreen';
 import SettingsScreen from '@/app/(tabs)/SettingsScreen';
@@ -55,6 +57,7 @@ export default function MainApp() {
 
   const handleTabPress = (tab: string) => {
     setActiveTab(tab);
+    closeSidebar(); // Close sidebar after selecting a tab
   };
 
   const renderActiveScreen = () => {
