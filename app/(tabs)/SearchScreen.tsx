@@ -12,6 +12,7 @@ import { Search, X, Clock, TrendingUp, ArrowLeft } from 'lucide-react-native';
 import { useNotes } from '@/hooks/useNotes';
 import NoteCard from '@/components/NoteCard';
 import { Note } from '@/types/Note';
+import { useTheme } from '@/context/ThemeContext';
 
 // Define props interface for screen components
 interface ScreenProps {
@@ -19,6 +20,7 @@ interface ScreenProps {
 }
 
 export default function SearchScreen({ onMenuPress }: ScreenProps) {
+  const { currentTheme } = useTheme();
   const { notes, searchNotes, togglePin, deleteNote } = useNotes();
   const [query, setQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([
@@ -68,11 +70,11 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
   const renderRecentSearches = () => (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Clock size={16} color="#9CA3AF" />
-        <Text style={styles.sectionTitle}>Recent Searches</Text>
+        <Clock size={16} color={currentTheme.colors.textSecondary} />
+        <Text style={[styles.sectionTitle, { color: currentTheme.colors.text }]}>Recent Searches</Text>
         {recentSearches.length > 0 && (
           <TouchableOpacity onPress={clearRecentSearches}>
-            <Text style={styles.clearText}>Clear</Text>
+            <Text style={[styles.clearText, { color: currentTheme.colors.accent }]}>Clear</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -82,15 +84,18 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
           {recentSearches.map((search, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.chip}
+              style={[styles.chip, { 
+                backgroundColor: currentTheme.colors.surface, 
+                borderColor: currentTheme.colors.border 
+              }]}
               onPress={() => handleSearch(search)}
             >
-              <Text style={styles.chipText}>{search}</Text>
+              <Text style={[styles.chipText, { color: currentTheme.colors.text }]}>{search}</Text>
             </TouchableOpacity>
           ))}
         </View>
       ) : (
-        <Text style={styles.emptyText}>No recent searches</Text>
+        <Text style={[styles.emptyText, { color: currentTheme.colors.textSecondary }]}>No recent searches</Text>
       )}
     </View>
   );
@@ -98,8 +103,8 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
   const renderPopularTags = () => (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <TrendingUp size={16} color="#9CA3AF" />
-        <Text style={styles.sectionTitle}>Popular Tags</Text>
+        <TrendingUp size={16} color={currentTheme.colors.textSecondary} />
+        <Text style={[styles.sectionTitle, { color: currentTheme.colors.text }]}>Popular Tags</Text>
       </View>
       
       {popularTags.length > 0 ? (
@@ -107,22 +112,25 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
           {popularTags.map((tag, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.chip, styles.tagChip]}
+              style={[styles.chip, { 
+                backgroundColor: currentTheme.colors.surface, 
+                borderColor: currentTheme.colors.accent 
+              }]}
               onPress={() => handleSearch(`#${tag}`)}
             >
-              <Text style={styles.chipText}>#{tag}</Text>
+              <Text style={[styles.chipText, { color: currentTheme.colors.text }]}>#{tag}</Text>
             </TouchableOpacity>
           ))}
         </View>
       ) : (
-        <Text style={styles.emptyText}>No tags found</Text>
+        <Text style={[styles.emptyText, { color: currentTheme.colors.textSecondary }]}>No tags found</Text>
       )}
     </View>
   );
 
   const renderSearchResults = () => (
     <View style={styles.resultsContainer}>
-      <Text style={styles.resultsHeader}>
+      <Text style={[styles.resultsHeader, { color: currentTheme.colors.text }]}>
         {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} for "{query}"
       </Text>
       
@@ -142,9 +150,9 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
         columnWrapperStyle={styles.row}
         ListEmptyComponent={
           <View style={styles.noResultsContainer}>
-            <Search size={48} color="#4B5563" />
-            <Text style={styles.noResultsTitle}>No Results Found</Text>
-            <Text style={styles.noResultsSubtitle}>
+            <Search size={48} color={currentTheme.colors.textSecondary} />
+            <Text style={[styles.noResultsTitle, { color: currentTheme.colors.text }]}>No Results Found</Text>
+            <Text style={[styles.noResultsSubtitle, { color: currentTheme.colors.textSecondary }]}>
               Try adjusting your search terms or check for typos
             </Text>
           </View>
@@ -154,20 +162,26 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Search Notes</Text>
+      <View style={[styles.header, { 
+        backgroundColor: currentTheme.colors.background,
+        borderBottomColor: currentTheme.colors.border
+      }]}>
+        <Text style={[styles.title, { color: currentTheme.colors.text }]}>Search Notes</Text>
       </View>
 
       {/* Search Input */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Search size={20} color="#9CA3AF" />
+      <View style={[styles.searchContainer, { backgroundColor: currentTheme.colors.background }]}>
+        <View style={[styles.searchInputContainer, { 
+          backgroundColor: currentTheme.colors.surface,
+          borderColor: currentTheme.colors.border
+        }]}>
+          <Search size={20} color={currentTheme.colors.textSecondary} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: currentTheme.colors.text }]}
             placeholder="Search notes, tags, or content..."
-            placeholderTextColor="#6B7280"
+            placeholderTextColor={currentTheme.colors.textSecondary}
             value={query}
             onChangeText={setQuery}
             returnKeyType="search"
@@ -175,14 +189,14 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={clearSearch}>
-              <X size={20} color="#9CA3AF" />
+              <X size={20} color={currentTheme.colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
       </View>
 
       {/* Content */}
-      <View style={styles.content}>
+      <View style={[styles.content, { backgroundColor: currentTheme.colors.background }]}>
         {query.trim() ? (
           renderSearchResults()
         ) : (
@@ -199,41 +213,33 @@ export default function SearchScreen({ onMenuPress }: ScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#111827',
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#F9FAFB',
   },
   searchContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#111827',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    color: '#F9FAFB',
   },
   content: {
     flex: 1,
@@ -253,12 +259,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#E5E7EB',
   },
   clearText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#8B5CF6',
   },
   chipContainer: {
     flexDirection: 'row',
@@ -266,26 +270,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#1F2937',
     borderWidth: 1,
-    borderColor: '#374151',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
   },
-  tagChip: {
-    backgroundColor: '#1F2937',
-    borderColor: '#8B5CF6',
-  },
   chipText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#D1D5DB',
   },
   emptyText: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#6B7280',
     fontStyle: 'italic',
   },
   resultsContainer: {
@@ -294,7 +290,6 @@ const styles = StyleSheet.create({
   resultsHeader: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#E5E7EB',
     marginBottom: 16,
   },
   row: {
@@ -310,14 +305,12 @@ const styles = StyleSheet.create({
   noResultsTitle: {
     fontSize: 20,
     fontFamily: 'Inter-Bold',
-    color: '#E5E7EB',
     marginTop: 16,
     marginBottom: 8,
   },
   noResultsSubtitle: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 20,
   },

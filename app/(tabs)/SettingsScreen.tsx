@@ -23,14 +23,20 @@ import {
   Menu
 } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { useTheme } from '@/context/ThemeContext';
 
 interface SettingsScreenProps {
   onMenuPress: () => void;
 }
 
 export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
-  const [darkMode, setDarkMode] = React.useState(true);
+  const { currentTheme, setTheme, autoTheme, setAutoTheme } = useTheme();
+  const isDarkMode = currentTheme.id === 'dark' || currentTheme.id === 'midnight';
   const [notifications, setNotifications] = React.useState(true);
+  
+  const toggleDarkMode = (value: boolean) => {
+    setTheme(value ? 'dark' : 'light');
+  };
 
   const handleExportData = () => {
     Alert.alert(
@@ -87,46 +93,52 @@ export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
     rightComponent?: React.ReactNode;
   }) => (
     <TouchableOpacity 
-      style={styles.settingItem} 
+      style={[styles.settingItem, { borderBottomColor: currentTheme.colors.border }]} 
       onPress={onPress}
       disabled={!onPress}
       activeOpacity={onPress ? 0.7 : 1}
     >
-      <View style={styles.settingIcon}>
+      <View style={[styles.settingIcon, { backgroundColor: currentTheme.colors.background }]}>
         {icon}
       </View>
       <View style={styles.settingContent}>
-        <Text style={styles.settingTitle}>{title}</Text>
+        <Text style={[styles.settingTitle, { color: currentTheme.colors.text }]}>{title}</Text>
         {subtitle && (
-          <Text style={styles.settingSubtitle}>{subtitle}</Text>
+          <Text style={[styles.settingSubtitle, { color: currentTheme.colors.textSecondary }]}>{subtitle}</Text>
         )}
       </View>
       {rightComponent || (showChevron && onPress && (
-        <ChevronRight size={20} color="#6B7280" />
+        <ChevronRight size={20} color={currentTheme.colors.textSecondary} />
       ))}
     </TouchableOpacity>
   );
 
   const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <View style={styles.settingSection}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.sectionContent}>
+      <Text style={[styles.sectionTitle, { color: currentTheme.colors.text }]}>{title}</Text>
+      <View style={[styles.sectionContent, { 
+        backgroundColor: currentTheme.colors.surface,
+        borderColor: currentTheme.colors.border 
+      }]}>
         {children}
       </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { 
+        backgroundColor: currentTheme.colors.background, 
+        borderBottomColor: currentTheme.colors.border 
+      }]}>
         <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
-          <Menu size={24} color="#E5E7EB" />
+          <Menu size={24} color={currentTheme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={[styles.title, { color: currentTheme.colors.text }]}>Settings</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={[styles.content, { backgroundColor: currentTheme.colors.background }]} showsVerticalScrollIndicator={false}>
 
 
         {/* Preferences Section */}
@@ -138,9 +150,9 @@ export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
             showChevron={false}
             rightComponent={
               <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
-                trackColor={{ false: '#374151', true: '#8B5CF6' }}
+                value={isDarkMode}
+                onValueChange={toggleDarkMode}
+                trackColor={{ false: currentTheme.colors.secondary, true: currentTheme.colors.accent }}
                 thumbColor="#FFFFFF"
               />
             }
@@ -211,10 +223,10 @@ export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={[styles.footerText, { color: currentTheme.colors.textSecondary }]}>
             Made with ❤️ using React Native
           </Text>
-          <Text style={styles.footerSubtext}>
+          <Text style={[styles.footerSubtext, { color: currentTheme.colors.textSecondary }]}>
             Your notes are stored locally on your device
           </Text>
         </View>
@@ -226,16 +238,13 @@ export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#111827',
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   menuButton: {
     padding: 8,
@@ -244,7 +253,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#F9FAFB',
   },
   content: {
     flex: 1,
@@ -256,17 +264,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#E5E7EB',
     marginBottom: 12,
     marginHorizontal: 20,
   },
   sectionContent: {
-    backgroundColor: '#1F2937',
     borderRadius: 16,
     marginHorizontal: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#374151',
   },
   settingItem: {
     flexDirection: 'row',
@@ -274,13 +279,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   settingIcon: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#111827',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -291,13 +294,11 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 2,
   },
   settingSubtitle: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     lineHeight: 18,
   },
   footer: {
@@ -308,13 +309,11 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
     marginBottom: 4,
   },
   footerSubtext: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#6B7280',
     textAlign: 'center',
   },
 });

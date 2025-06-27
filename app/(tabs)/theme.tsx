@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import {
   Sparkles
 } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { useTheme } from '@/context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -45,63 +46,33 @@ interface AccentColor {
 }
 
 export default function ThemeScreen() {
-  const [selectedTheme, setSelectedTheme] = useState('dark');
-  const [selectedAccent, setSelectedAccent] = useState('purple');
-  const [autoTheme, setAutoTheme] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const { currentTheme: activeTheme, accentColor, autoTheme, setTheme, setAccentColor, setAutoTheme, themes: themeOptions, accentColors: accentOptions } = useTheme();
+  const [selectedTheme, setSelectedTheme] = React.useState(activeTheme.id);
+  const [selectedAccent, setSelectedAccent] = React.useState(accentOptions.find(a => a.color === accentColor)?.id || 'purple');
+  const [showPreview, setShowPreview] = React.useState(false);
 
-  const themes: ThemeOption[] = [
+  // Map from theme context to local format
+  const themes: ThemeOption[] = themeOptions.map(theme => (
     {
-      id: 'light',
-      name: 'Light Mode',
-      description: 'Clean and bright interface',
-      icon: <Sun size={24} color="#F59E0B" />,
+      id: theme.id,
+      name: theme.id === 'light' ? 'Light Mode' : theme.id === 'dark' ? 'Dark Mode' : 'Midnight',
+      description: theme.id === 'light' ? 'Clean and bright interface' : 
+                  theme.id === 'dark' ? 'Easy on the eyes' : 'Pure black for OLED displays',
+      icon: theme.id === 'light' ? <Sun size={24} color="#F59E0B" /> : 
+            theme.id === 'dark' ? <Moon size={24} color="#6366F1" /> : 
+            <Sparkles size={24} color="#8B5CF6" />,
       colors: {
-        primary: '#8B5CF6',
-        secondary: '#F3F4F6',
-        background: '#FFFFFF',
-        surface: '#F9FAFB',
-        text: '#111827',
+        primary: theme.colors.primary,
+        secondary: theme.colors.secondary,
+        background: theme.colors.background,
+        surface: theme.colors.surface,
+        text: theme.colors.text,
       },
-    },
-    {
-      id: 'dark',
-      name: 'Dark Mode',
-      description: 'Easy on the eyes',
-      icon: <Moon size={24} color="#6366F1" />,
-      colors: {
-        primary: '#8B5CF6',
-        secondary: '#1F2937',
-        background: '#111827',
-        surface: '#1F2937',
-        text: '#F9FAFB',
-      },
-    },
-    {
-      id: 'midnight',
-      name: 'Midnight',
-      description: 'Pure black for OLED displays',
-      icon: <Sparkles size={24} color="#8B5CF6" />,
-      colors: {
-        primary: '#8B5CF6',
-        secondary: '#0F0F0F',
-        background: '#000000',
-        surface: '#0F0F0F',
-        text: '#FFFFFF',
-      },
-    },
-  ];
+    }
+  ));
 
-  const accentColors: AccentColor[] = [
-    { id: 'purple', name: 'Purple', color: '#8B5CF6' },
-    { id: 'blue', name: 'Blue', color: '#3B82F6' },
-    { id: 'green', name: 'Green', color: '#10B981' },
-    { id: 'orange', name: 'Orange', color: '#F59E0B' },
-    { id: 'pink', name: 'Pink', color: '#EC4899' },
-    { id: 'red', name: 'Red', color: '#EF4444' },
-    { id: 'indigo', name: 'Indigo', color: '#6366F1' },
-    { id: 'teal', name: 'Teal', color: '#14B8A6' },
-  ];
+  // Use accent colors from theme context
+  const accentColors: AccentColor[] = accentOptions;
 
   const currentTheme = themes.find(t => t.id === selectedTheme) || themes[1];
   const currentAccent = accentColors.find(a => a.id === selectedAccent) || accentColors[0];
@@ -177,73 +148,76 @@ export default function ThemeScreen() {
     );
   };
 
+  const applyChanges = () => {
+    setTheme(selectedTheme);
+    setAccentColor(currentAccent.color);
+    setAutoTheme(autoTheme);
+    router.back();
+  };
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: activeTheme.colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: activeTheme.colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#F9FAFB" />
+          <ArrowLeft size={24} color={activeTheme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Theme</Text>
+        <Text style={[styles.headerTitle, { color: activeTheme.colors.text }]}>Appearance</Text>
         <TouchableOpacity 
           onPress={() => setShowPreview(!showPreview)}
-          style={styles.previewButton}
+          style={{padding: 8}}
         >
-          <Eye size={20} color={showPreview ? currentAccent.color : '#9CA3AF'} />
+          <Eye size={20} color={showPreview ? currentAccent.color : activeTheme.colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={[styles.content, { backgroundColor: activeTheme.colors.background }]} showsVerticalScrollIndicator={false}>
         {/* Auto Theme Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Smartphone size={20} color="#9CA3AF" />
-            <Text style={styles.sectionTitle}>Automatic</Text>
+            <Smartphone size={20} color={activeTheme.colors.textSecondary} />
+            <Text style={[styles.sectionTitle, { color: activeTheme.colors.text }]}>Automatic</Text>
           </View>
           
           <View style={styles.settingCard}>
-            <View style={styles.settingItem}>
+            <View style={[styles.settingItem, { borderBottomColor: activeTheme.colors.border }]}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Follow System</Text>
-                <Text style={styles.settingSubtitle}>
-                  Automatically switch between light and dark themes based on your device settings
+                <Text style={[styles.settingTitle, { color: activeTheme.colors.text }]}>Auto Dark Mode</Text>
+                <Text style={[styles.settingSubtitle, { color: activeTheme.colors.textSecondary }]}>
+                  Switch between light and dark mode based on system settings
                 </Text>
               </View>
               <Switch
                 value={autoTheme}
                 onValueChange={setAutoTheme}
-                trackColor={{ false: '#374151', true: currentAccent.color }}
-                thumbColor="#FFFFFF"
+                trackColor={{ false: activeTheme.colors.secondary, true: currentAccent.color }}
+                thumbColor="#F9FAFB"
               />
             </View>
           </View>
         </View>
 
         {/* Theme Selection */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Palette size={20} color="#9CA3AF" />
-            <Text style={styles.sectionTitle}>Appearance</Text>
-          </View>
-          
+        <View style={{ paddingTop: 24 }}>
+          <Text style={[styles.sectionTitle, { paddingHorizontal: 20, color: activeTheme.colors.text }]}>
+            Theme
+          </Text>
           <View style={styles.themesContainer}>
             {themes.map(renderThemeCard)}
           </View>
         </View>
 
-        {/* Accent Colors */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Paintbrush size={20} color="#9CA3AF" />
-            <Text style={styles.sectionTitle}>Accent Color</Text>
-          </View>
-          
+        {/* Accent Color */}
+        <View style={{ paddingTop: 32 }}>
+          <Text style={[styles.sectionTitle, { paddingHorizontal: 20, color: activeTheme.colors.text }]}>
+            Accent Color
+          </Text>
           <View style={styles.accentColorsContainer}>
             {accentColors.map(renderAccentColor)}
           </View>
           
-          <Text style={styles.accentDescription}>
-            Choose an accent color that will be used for buttons, links, and highlights throughout the app.
+          <Text style={[styles.accentDescription, { color: activeTheme.colors.textSecondary }]}>
+            The accent color is used for buttons, links, and highlights throughout the app.
           </Text>
         </View>
 
@@ -251,8 +225,8 @@ export default function ThemeScreen() {
         {showPreview && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Eye size={20} color="#9CA3AF" />
-              <Text style={styles.sectionTitle}>Live Preview</Text>
+              <Eye size={20} color={activeTheme.colors.textSecondary} />
+              <Text style={[styles.sectionTitle, { color: activeTheme.colors.text }]}>Live Preview</Text>
             </View>
             
             <View style={[
@@ -329,15 +303,15 @@ export default function ThemeScreen() {
 
         {/* Apply Button */}
         <View style={styles.applySection}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.applyButton, { backgroundColor: currentAccent.color }]}
-            activeOpacity={0.8}
+            onPress={applyChanges}
           >
-            <Text style={styles.applyButtonText}>Apply Theme</Text>
+            <Text style={[styles.applyButtonText, { color: '#FFFFFF' }]}>Apply Changes</Text>
           </TouchableOpacity>
           
-          <Text style={styles.applyNote}>
-            Changes will be applied immediately and saved to your preferences.
+          <Text style={[styles.applyNote, { color: activeTheme.colors.textSecondary }]}>
+            Changes will apply to all screens immediately.
           </Text>
         </View>
       </ScrollView>
@@ -348,30 +322,21 @@ export default function ThemeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   backButton: {
     padding: 8,
   },
-  title: {
-    fontSize: 20,
-    fontFamily: 'Inter-Bold',
-    color: '#F9FAFB',
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 16,
-  },
-  previewButton: {
-    padding: 8,
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    marginLeft: 12,
   },
   content: {
     flex: 1,
@@ -389,19 +354,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#E5E7EB',
   },
   settingCard: {
-    backgroundColor: '#1F2937',
     marginHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
+    borderBottomWidth: 1,
   },
   settingInfo: {
     flex: 1,
@@ -410,13 +373,11 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 4,
   },
   settingSubtitle: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     lineHeight: 20,
   },
   themesContainer: {
@@ -424,10 +385,8 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   themeCard: {
-    backgroundColor: '#1F2937',
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#374151',
     overflow: 'hidden',
   },
   themeCardSelected: {
@@ -442,7 +401,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#111827',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -453,13 +411,11 @@ const styles = StyleSheet.create({
   themeName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 2,
   },
   themeDescription: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
   },
   checkIcon: {
     width: 24,
@@ -529,7 +485,6 @@ const styles = StyleSheet.create({
   accentDescription: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     paddingHorizontal: 20,
     marginTop: 16,
     lineHeight: 20,
@@ -540,7 +495,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     height: 200,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   previewAppBar: {
     height: 44,
@@ -608,14 +562,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   applyButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
   },
   applyNote: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 16,
   },

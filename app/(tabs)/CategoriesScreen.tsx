@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FolderOpen, FileText, ChevronRight, Menu } from 'lucide-react-native';
 import { useNotes } from '@/hooks/useNotes';
+import { useTheme } from '@/context/ThemeContext';
 
 // Define props interface for screen components
 interface ScreenProps {
@@ -16,6 +17,7 @@ interface ScreenProps {
 }
 
 export default function CategoriesScreen({ onMenuPress }: ScreenProps) {
+  const { currentTheme } = useTheme();
   const { categories, getNotesByCategory } = useNotes();
 
   const renderCategoryCard = ({ item }: { item: any }) => {
@@ -25,36 +27,44 @@ export default function CategoriesScreen({ onMenuPress }: ScreenProps) {
     )[0];
 
     return (
-      <TouchableOpacity style={styles.categoryCard} activeOpacity={0.8}>
+      <TouchableOpacity 
+        style={[styles.categoryCard, {
+          backgroundColor: currentTheme.colors.surface,
+          borderColor: currentTheme.colors.border
+        }]} 
+        activeOpacity={0.8}>
         <View style={styles.categoryHeader}>
           <View style={styles.categoryTitleContainer}>
             <View style={[styles.categoryIcon, { backgroundColor: `${item.color}20` }]}>
               <FolderOpen size={20} color={item.color} />
             </View>
             <View style={styles.categoryInfo}>
-              <Text style={styles.categoryName}>{item.name}</Text>
-              <Text style={styles.categoryCount}>
+              <Text style={[styles.categoryName, { color: currentTheme.colors.text }]}>{item.name}</Text>
+              <Text style={[styles.categoryCount, { color: currentTheme.colors.textSecondary }]}>
                 {item.noteCount} {item.noteCount === 1 ? 'note' : 'notes'}
               </Text>
             </View>
           </View>
-          <ChevronRight size={20} color="#6B7280" />
+          <ChevronRight size={20} color={currentTheme.colors.textSecondary} />
         </View>
 
         {recentNote && (
-          <View style={styles.recentNoteContainer}>
-            <Text style={styles.recentNoteLabel}>Recent:</Text>
-            <Text style={styles.recentNoteTitle} numberOfLines={1}>
+          <View style={[styles.recentNoteContainer, {
+            backgroundColor: currentTheme.colors.background,
+            borderColor: currentTheme.colors.border
+          }]}>
+            <Text style={[styles.recentNoteLabel, { color: currentTheme.colors.textSecondary }]}>Recent:</Text>
+            <Text style={[styles.recentNoteTitle, { color: currentTheme.colors.text }]} numberOfLines={1}>
               {recentNote.title || 'Untitled Note'}
             </Text>
-            <Text style={styles.recentNoteContent} numberOfLines={2}>
+            <Text style={[styles.recentNoteContent, { color: currentTheme.colors.textSecondary }]} numberOfLines={2}>
               {recentNote.content || 'No content'}
             </Text>
           </View>
         )}
 
         <View style={styles.categoryFooter}>
-          <View style={styles.progressBar}>
+          <View style={[styles.progressBar, { backgroundColor: currentTheme.colors.secondary }]}>
             <View 
               style={[
                 styles.progressFill, 
@@ -72,9 +82,9 @@ export default function CategoriesScreen({ onMenuPress }: ScreenProps) {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <FolderOpen size={64} color="#4B5563" />
-      <Text style={styles.emptyStateTitle}>No Categories Yet</Text>
-      <Text style={styles.emptyStateSubtitle}>
+      <FolderOpen size={64} color={currentTheme.colors.textSecondary} />
+      <Text style={[styles.emptyStateTitle, { color: currentTheme.colors.text }]}>No Categories Yet</Text>
+      <Text style={[styles.emptyStateSubtitle, { color: currentTheme.colors.textSecondary }]}>
         Categories will appear here as you create notes
       </Text>
     </View>
@@ -83,42 +93,54 @@ export default function CategoriesScreen({ onMenuPress }: ScreenProps) {
   const totalNotes = categories.reduce((sum, cat) => sum + cat.noteCount, 0);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { 
+        backgroundColor: currentTheme.colors.background, 
+        borderBottomColor: currentTheme.colors.border 
+      }]}>
         <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
-          <Menu size={24} color="#E5E7EB" />
+          <Menu size={24} color={currentTheme.colors.text} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.title}>Categories</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: currentTheme.colors.text }]}>Categories</Text>
+          <Text style={[styles.subtitle, { color: currentTheme.colors.textSecondary }]}>
             {totalNotes} total {totalNotes === 1 ? 'note' : 'notes'} organized
           </Text>
         </View>
       </View>
 
       {/* Stats Overview */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <FolderOpen size={24} color="#8B5CF6" />
-          <Text style={styles.statNumber}>{categories.length}</Text>
-          <Text style={styles.statLabel}>Categories</Text>
+      <View style={[styles.statsContainer, { backgroundColor: currentTheme.colors.background }]}>
+        <View style={[styles.statCard, { 
+          backgroundColor: currentTheme.colors.surface, 
+          borderColor: currentTheme.colors.border 
+        }]}>
+          <FolderOpen size={24} color={currentTheme.colors.accent} />
+          <Text style={[styles.statNumber, { color: currentTheme.colors.text }]}>{categories.length}</Text>
+          <Text style={[styles.statLabel, { color: currentTheme.colors.textSecondary }]}>Categories</Text>
         </View>
         
-        <View style={styles.statCard}>
+        <View style={[styles.statCard, { 
+          backgroundColor: currentTheme.colors.surface, 
+          borderColor: currentTheme.colors.border 
+        }]}>
           <FileText size={24} color="#F59E0B" />
-          <Text style={styles.statNumber}>{totalNotes}</Text>
-          <Text style={styles.statLabel}>Total Notes</Text>
+          <Text style={[styles.statNumber, { color: currentTheme.colors.text }]}>{totalNotes}</Text>
+          <Text style={[styles.statLabel, { color: currentTheme.colors.textSecondary }]}>Total Notes</Text>
         </View>
         
-        <View style={styles.statCard}>
+        <View style={[styles.statCard, { 
+          backgroundColor: currentTheme.colors.surface, 
+          borderColor: currentTheme.colors.border 
+        }]}>
           <View style={styles.mostActiveIcon}>
             <Text style={styles.mostActiveEmoji}>🏆</Text>
           </View>
-          <Text style={styles.statNumber}>
+          <Text style={[styles.statNumber, { color: currentTheme.colors.text }]}>
             {categories.reduce((max, cat) => Math.max(max, cat.noteCount), 0)}
           </Text>
-          <Text style={styles.statLabel}>Most Active</Text>
+          <Text style={[styles.statLabel, { color: currentTheme.colors.textSecondary }]}>Most Active</Text>
         </View>
       </View>
 
@@ -141,16 +163,13 @@ export default function CategoriesScreen({ onMenuPress }: ScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#111827',
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   menuButton: {
     marginRight: 12,
@@ -158,40 +177,33 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#F9FAFB',
   },
   subtitle: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     marginTop: 2,
   },
   statsContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: '#111827',
     gap: 12,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#1F2937',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   statNumber: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#F9FAFB',
   },
   statLabel: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
     textAlign: 'center',
   },
   mostActiveIcon: {
@@ -212,12 +224,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryCard: {
-    backgroundColor: '#1F2937',
     borderRadius: 16,
     padding: 20,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -244,38 +254,31 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 2,
   },
   categoryCount: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
   },
   recentNoteContainer: {
-    backgroundColor: '#111827',
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   recentNoteLabel: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
     marginBottom: 4,
   },
   recentNoteTitle: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 2,
   },
   recentNoteContent: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#D1D5DB',
     lineHeight: 16,
   },
   categoryFooter: {
@@ -285,7 +288,6 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 4,
-    backgroundColor: '#374151',
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -302,14 +304,12 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#E5E7EB',
     marginTop: 24,
     marginBottom: 8,
   },
   emptyStateSubtitle: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 24,
   },

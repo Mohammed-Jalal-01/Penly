@@ -7,14 +7,16 @@ import {
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Redirect } from 'expo-router';
+import { useTheme } from '@/context/ThemeContext';
 import Sidebar from '@/components/Sidebar';
-// Import screen components directly
+// Importing screen components directly
 import NotesScreen from '@/app/(tabs)/index';
 import SearchScreen from '@/app/(tabs)/SearchScreen';
 import SettingsScreen from '@/app/(tabs)/SettingsScreen';
 import CategoriesScreen from '@/app/(tabs)/CategoriesScreen';
 
 export default function MainApp() {
+  const { currentTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('index');
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -79,9 +81,15 @@ export default function MainApp() {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+  });
+
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: currentTheme.colors.background }]}>
         {renderActiveScreen()}
         
         <Sidebar
@@ -99,6 +107,5 @@ export default function MainApp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
 });

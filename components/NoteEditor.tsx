@@ -20,6 +20,7 @@ import {
   Trash2 
 } from 'lucide-react-native';
 import { Note } from '@/types/Note';
+import { useTheme } from '@/context/ThemeContext';
 
 interface NoteEditorProps {
   note?: Note;
@@ -40,6 +41,7 @@ export default function NoteEditor({
   onClose,
   categories,
 }: NoteEditorProps) {
+  const { currentTheme } = useTheme();
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content || '');
   const [category, setCategory] = useState(note?.category || 'Personal');
@@ -131,15 +133,15 @@ export default function NoteEditor({
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, {backgroundColor: currentTheme.colors.background}]} edges={['top']}>
       <KeyboardAvoidingView 
-        style={styles.container}
+        style={[styles.container, {backgroundColor: currentTheme.colors.background}]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, {borderBottomColor: currentTheme.colors.border}]}>
           <TouchableOpacity onPress={handleClose} style={styles.headerButton}>
-            <ArrowLeft size={24} color="#F9FAFB" />
+            <ArrowLeft size={24} color={currentTheme.colors.text} />
           </TouchableOpacity>
           
           <View style={styles.headerActions}>
@@ -150,50 +152,66 @@ export default function NoteEditor({
               >
                 <Pin 
                   size={20} 
-                  color={note.isPinned ? '#F59E0B' : '#9CA3AF'}
-                  fill={note.isPinned ? '#F59E0B' : 'none'}
+                  color={note.isPinned ? currentTheme.colors.warning : currentTheme.colors.textSecondary}
+                  fill={note.isPinned ? currentTheme.colors.warning : "transparent"}
                 />
               </TouchableOpacity>
             )}
             
-            {note && onDelete && (
-              <TouchableOpacity onPress={handleDelete} style={styles.headerButton}>
+            {onDelete && note && (
+              <TouchableOpacity 
+                onPress={handleDelete}
+                style={styles.headerButton}
+              >
                 <Trash2 size={20} color="#EF4444" />
               </TouchableOpacity>
             )}
             
-            <TouchableOpacity 
-              onPress={handleSave} 
-              style={[styles.saveButton, !hasUnsavedChanges && styles.saveButtonDisabled]}
+            <TouchableOpacity
+              onPress={handleSave}
+              style={[
+                styles.saveButton, 
+                { backgroundColor: hasUnsavedChanges ? currentTheme.colors.accent : currentTheme.colors.secondary }
+              ]}
               disabled={!hasUnsavedChanges}
             >
-              <Save size={18} color={hasUnsavedChanges ? '#FFFFFF' : '#6B7280'} />
-              <Text style={[styles.saveButtonText, !hasUnsavedChanges && styles.saveButtonTextDisabled]}>
-                Save
-              </Text>
+              <Save size={16} color={hasUnsavedChanges ? "#FFFFFF" : currentTheme.colors.textSecondary} />
+              <Text style={[
+                styles.saveButtonText, 
+                { color: hasUnsavedChanges ? "#FFFFFF" : currentTheme.colors.textSecondary }
+              ]}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView style={[styles.content, { backgroundColor: currentTheme.colors.background }]} showsVerticalScrollIndicator={false}>
           {/* Title Input */}
           <TextInput
-            style={styles.titleInput}
-            placeholder="Note title..."
-            placeholderTextColor="#6B7280"
+            style={[styles.titleInput, { color: currentTheme.colors.text }]}
+            placeholder="Title"
+            placeholderTextColor={currentTheme.colors.textSecondary}
             value={title}
             onChangeText={setTitle}
             multiline
             maxLength={100}
           />
 
-          {/* Category Selection */}
+          {/* Category Selector */}
           <TouchableOpacity 
-            style={styles.categorySelector}
+            style={[styles.categorySelector, { 
+              backgroundColor: currentTheme.colors.surface,
+              borderColor: currentTheme.colors.border 
+            }]}
             onPress={() => setShowCategoryPicker(!showCategoryPicker)}
           >
-            <FolderOpen size={16} color="#9CA3AF" />
-            <Text style={styles.categorySelectorText}>{category}</Text>
+            <View 
+              style={[
+                styles.categoryDot,
+                { backgroundColor: categories.find(c => c.name === category)?.color || currentTheme.colors.textSecondary }
+              ]}
+            />
+            <Text style={[styles.categorySelectorText, { color: currentTheme.colors.textSecondary }]}>{category}</Text>
+            <Text style={[styles.categorySelectorText, { color: currentTheme.colors.textSecondary }]}>▼</Text>
           </TouchableOpacity>
 
           {showCategoryPicker && (
@@ -213,31 +231,30 @@ export default function NoteEditor({
                   <View style={[styles.categoryDot, { backgroundColor: cat.color }]} />
                   <Text style={[
                     styles.categoryOptionText,
-                    category === cat.name && styles.categoryOptionTextSelected
-                  ]}>
-                    {cat.name}
-                  </Text>
+                    { color: currentTheme.colors.textSecondary },
+                    category === cat.name && [styles.categoryOptionTextSelected, { color: currentTheme.colors.accent }]
+                  ]}>{cat.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           )}
 
-          {/* Content Input */}
+          {/* Note Content */}
           <TextInput
-            style={styles.contentInput}
-            placeholder="Start writing your note..."
-            placeholderTextColor="#6B7280"
+            style={[styles.contentInput, { color: currentTheme.colors.text }]}
+            placeholder="Start typing..."
+            placeholderTextColor={currentTheme.colors.textSecondary}
             value={content}
             onChangeText={setContent}
             multiline
-            textAlignVertical="top"
+            keyboardType="default"
           />
 
           {/* Tags Section */}
           <View style={styles.tagsSection}>
             <View style={styles.tagsSectionHeader}>
-              <Tag size={16} color="#9CA3AF" />
-              <Text style={styles.tagsSectionTitle}>Tags</Text>
+              <Tag size={16} color={currentTheme.colors.textSecondary} />
+              <Text style={[styles.tagsSectionTitle, { color: currentTheme.colors.text }]}>Tags</Text>
             </View>
             
             <View style={styles.tagInputContainer}>
@@ -260,11 +277,11 @@ export default function NoteEditor({
                 {tags.map((tag, index) => (
                   <TouchableOpacity
                     key={index}
-                    style={styles.tag}
+                    style={[styles.tag, { backgroundColor: currentTheme.id === 'light' ? currentTheme.colors.secondary : '#374151' }]}
                     onPress={() => removeTag(tag)}
                   >
-                    <Text style={styles.tagText}>#{tag}</Text>
-                    <Text style={styles.removeTagText}>×</Text>
+                    <Text style={[styles.tagText, { color: currentTheme.colors.accent }]}>#{tag}</Text>
+                    <Text style={[styles.removeTagText, { color: currentTheme.colors.textSecondary }]}>×</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -279,7 +296,6 @@ export default function NoteEditor({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
   header: {
     flexDirection: 'row',
@@ -288,7 +304,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   headerButton: {
     padding: 8,
@@ -301,22 +316,14 @@ const styles = StyleSheet.create({
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#8B5CF6',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     gap: 6,
   },
-  saveButtonDisabled: {
-    backgroundColor: '#374151',
-  },
   saveButtonText: {
-    color: '#FFFFFF',
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-  },
-  saveButtonTextDisabled: {
-    color: '#6B7280',
   },
   content: {
     flex: 1,
@@ -325,7 +332,6 @@ const styles = StyleSheet.create({
   titleInput: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#F9FAFB',
     marginTop: 20,
     marginBottom: 16,
     lineHeight: 32,
@@ -333,27 +339,22 @@ const styles = StyleSheet.create({
   categorySelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
     marginBottom: 16,
     gap: 8,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   categorySelectorText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#D1D5DB',
   },
   categoryPicker: {
-    backgroundColor: '#1F2937',
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#374151',
   },
   categoryOption: {
     flexDirection: 'row',
@@ -363,7 +364,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryOptionSelected: {
-    backgroundColor: '#374151',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
   },
   categoryDot: {
     width: 8,
@@ -373,15 +374,13 @@ const styles = StyleSheet.create({
   categoryOptionText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#D1D5DB',
   },
   categoryOptionTextSelected: {
-    color: '#8B5CF6',
+    // Color provided inline
   },
   contentInput: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    color: '#F9FAFB',
     lineHeight: 24,
     minHeight: 200,
     marginBottom: 24,
@@ -398,33 +397,27 @@ const styles = StyleSheet.create({
   tagsSectionTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#E5E7EB',
   },
   tagInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
     borderRadius: 12,
     paddingHorizontal: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#374151',
   },
   tagInput: {
     flex: 1,
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#F9FAFB',
     paddingVertical: 12,
   },
   addTagButton: {
-    backgroundColor: '#8B5CF6',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
   },
   addTagButtonText: {
-    color: '#FFFFFF',
     fontSize: 12,
     fontFamily: 'Inter-Medium',
   },
@@ -436,7 +429,6 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#374151',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -445,11 +437,9 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#8B5CF6',
   },
   removeTagText: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
-    color: '#9CA3AF',
   },
 });

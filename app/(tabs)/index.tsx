@@ -15,6 +15,7 @@ import { useNotes } from '@/hooks/useNotes';
 import NoteCard from '@/components/NoteCard';
 import NoteEditor from '@/components/NoteEditor';
 import { Note } from '@/types/Note';
+import { useTheme } from '@/context/ThemeContext';
 
 // Define props interface for screen components
 interface ScreenProps {
@@ -22,6 +23,7 @@ interface ScreenProps {
 }
 
 export default function NotesScreen({ onMenuPress }: ScreenProps) {
+  const { currentTheme } = useTheme();
   const {
     notes,
     categories,
@@ -97,28 +99,30 @@ export default function NotesScreen({ onMenuPress }: ScreenProps) {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <StickyNote size={64} color="#4B5563" />
-      <Text style={styles.emptyStateTitle}>No Notes Yet</Text>
-      <Text style={styles.emptyStateSubtitle}>
+      <StickyNote size={64} color={currentTheme.colors.textSecondary} />
+      <Text style={[styles.emptyStateTitle, { color: currentTheme.colors.text }]}>No Notes Yet</Text>
+      <Text style={[styles.emptyStateSubtitle, { color: currentTheme.colors.textSecondary }]}>
         Start capturing your thoughts and ideas
       </Text>
-      <TouchableOpacity style={styles.createFirstNoteButton} onPress={handleNewNote}>
+      <TouchableOpacity style={[styles.createFirstNoteButton, { backgroundColor: currentTheme.colors.accent }]} onPress={handleNewNote}>
         <Text style={styles.createFirstNoteButtonText}>Create Your First Note</Text>
       </TouchableOpacity>
     </View>
   );
 
   const renderCategoryFilter = () => (
-    <View style={styles.filterContainer}>
+    <View style={[styles.filterContainer, { backgroundColor: currentTheme.colors.background }]}>
       <TouchableOpacity
         style={[
           styles.filterChip,
-          filterCategory === null && styles.filterChipActive
+          { backgroundColor: currentTheme.colors.surface, borderColor: currentTheme.colors.border },
+          filterCategory === null && [styles.filterChipActive, { backgroundColor: currentTheme.colors.accent, borderColor: currentTheme.colors.accent }]
         ]}
         onPress={() => setFilterCategory(null)}
       >
         <Text style={[
           styles.filterChipText,
+          { color: currentTheme.colors.textSecondary },
           filterCategory === null && styles.filterChipTextActive
         ]}>
           All
@@ -130,13 +134,15 @@ export default function NotesScreen({ onMenuPress }: ScreenProps) {
           key={category.id}
           style={[
             styles.filterChip,
-            filterCategory === category.name && styles.filterChipActive
+            { backgroundColor: currentTheme.colors.surface, borderColor: currentTheme.colors.border },
+            filterCategory === category.name && [styles.filterChipActive, { backgroundColor: currentTheme.colors.accent, borderColor: currentTheme.colors.accent }]
           ]}
           onPress={() => setFilterCategory(category.name)}
         >
           <View style={[styles.filterChipDot, { backgroundColor: category.color }]} />
           <Text style={[
             styles.filterChipText,
+            { color: currentTheme.colors.textSecondary },
             filterCategory === category.name && styles.filterChipTextActive
           ]}>
             {category.name}
@@ -160,18 +166,18 @@ export default function NotesScreen({ onMenuPress }: ScreenProps) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: currentTheme.colors.background }]}>
         <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
-          <Menu size={24} color="#E5E7EB" />
+          <Menu size={24} color={currentTheme.colors.textSecondary} />
         </TouchableOpacity>
         
-        <Text style={styles.searchPlaceholder}>Search your notes</Text>
+        <Text style={[styles.searchPlaceholder, { color: currentTheme.colors.textSecondary }]}>Search your notes</Text>
         
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.moreButton}>
-            <MoreHorizontal size={24} color="#E5E7EB" />
+            <MoreHorizontal size={24} color={currentTheme.colors.textSecondary} />
           </TouchableOpacity>
           <Image 
             source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' }}
@@ -206,8 +212,8 @@ export default function NotesScreen({ onMenuPress }: ScreenProps) {
       />
 
       {/* Floating Action Button */}
-      <TouchableOpacity style={styles.fab} onPress={handleNewNote}>
-        <Plus size={28} color="#FFFFFF" />
+      <TouchableOpacity style={[styles.fab, { backgroundColor: currentTheme.colors.accent, shadowColor: currentTheme.colors.accent }]} onPress={handleNewNote}>
+        <Plus size={28} color={currentTheme.id === 'light' ? '#FFFFFF' : '#FFFFFF'} />
       </TouchableOpacity>
 
       {/* Note Editor Modal */}
@@ -233,7 +239,6 @@ export default function NotesScreen({ onMenuPress }: ScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111827',
   },
   loadingContainer: {
     flex: 1,
@@ -243,14 +248,12 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#111827',
   },
   menuButton: {
     padding: 8,
@@ -259,7 +262,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     marginLeft: 16,
   },
   headerRight: {
@@ -279,7 +281,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#111827',
     gap: 8,
   },
   filterChip: {
@@ -288,14 +289,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#1F2937',
     borderWidth: 1,
-    borderColor: '#374151',
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: '#8B5CF6',
-    borderColor: '#8B5CF6',
+    // Dynamic background color from theme
   },
   filterChipDot: {
     width: 6,
@@ -305,7 +303,6 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
   },
   filterChipTextActive: {
     color: '#FFFFFF',
@@ -321,7 +318,6 @@ const styles = StyleSheet.create({
   filterChipBadgeText: {
     fontSize: 10,
     fontFamily: 'Inter-Bold',
-    color: '#9CA3AF',
   },
   notesList: {
     paddingHorizontal: 16,
@@ -343,26 +339,23 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#E5E7EB',
     marginTop: 24,
     marginBottom: 8,
   },
   emptyStateSubtitle: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 32,
   },
   createFirstNoteButton: {
-    backgroundColor: '#8B5CF6',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
   },
   createFirstNoteButtonText: {
-    color: '#FFFFFF',
+    color: '#FFFFFF', // White text for good contrast on accent color buttons
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
   },
@@ -373,10 +366,8 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#8B5CF6',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#8B5CF6',
     shadowOffset: {
       width: 0,
       height: 8,

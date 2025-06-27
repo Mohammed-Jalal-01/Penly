@@ -16,6 +16,7 @@ import {
   Settings,
   X
 } from 'lucide-react-native';
+import { useTheme } from '@/context/ThemeContext';
 
 interface SidebarProps {
   isVisible: boolean;
@@ -35,6 +36,7 @@ export default function Sidebar({
   onTabPress, 
   slideAnim 
 }: SidebarProps) {
+  const { currentTheme } = useTheme();
   const menuItems = [
     { id: 'index', title: 'Notes', icon: NotebookPen },
     { id: 'search', title: 'Search', icon: Search },
@@ -75,6 +77,8 @@ export default function Sidebar({
         style={[
           styles.sidebar,
           {
+            backgroundColor: currentTheme.colors.surface,
+            borderRightColor: currentTheme.id === 'light' ? currentTheme.colors.border : '#374151',
             transform: [{
               translateX: slideAnim.interpolate({
                 inputRange: [0, 1],
@@ -86,20 +90,20 @@ export default function Sidebar({
       >
         <SafeAreaView style={styles.sidebarContent} edges={['top', 'bottom']}>
           {/* Header */}
-          <View style={styles.sidebarHeader}>
+          <View style={[styles.sidebarHeader, { borderBottomColor: currentTheme.id === 'light' ? currentTheme.colors.border : '#374151' }]}>
             <View style={styles.profileSection}>
               <Image 
                 source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' }}
                 style={styles.profileImage}
               />
               <View style={styles.profileInfo}>
-                <Text style={styles.profileName}>John Doe</Text>
-                <Text style={styles.profileEmail}>john@example.com</Text>
+                <Text style={[styles.profileName, { color: currentTheme.colors.text }]}>John Doe</Text>
+                <Text style={[styles.profileEmail, { color: currentTheme.colors.textSecondary }]}>john@example.com</Text>
               </View>
             </View>
             
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color="#9CA3AF" />
+              <X size={24} color={currentTheme.colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -112,29 +116,29 @@ export default function Sidebar({
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.menuItem, isActive && styles.menuItemActive]}
+                  style={[styles.menuItem, isActive && [styles.menuItemActive, { backgroundColor: currentTheme.id === 'light' ? currentTheme.colors.secondary : '#374151' }]]}
                   onPress={() => handleTabPress(item.id)}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.menuIconContainer, isActive && styles.menuIconContainerActive]}>
+                  <View style={[styles.menuIconContainer, isActive && [styles.menuIconContainerActive, { backgroundColor: `${currentTheme.colors.accent}20` }]]}>
                     <IconComponent 
                       size={20} 
-                      color={isActive ? '#8B5CF6' : '#9CA3AF'} 
+                      color={isActive ? currentTheme.colors.accent : currentTheme.colors.textSecondary} 
                     />
                   </View>
-                  <Text style={[styles.menuItemText, isActive && styles.menuItemTextActive]}>
+                  <Text style={[styles.menuItemText, { color: currentTheme.colors.textSecondary }, isActive && { color: currentTheme.colors.text }]}>
                     {item.title}
                   </Text>
-                  {isActive && <View style={styles.activeIndicator} />}
+                  {isActive && <View style={[styles.activeIndicator, { backgroundColor: currentTheme.colors.accent }]} />}
                 </TouchableOpacity>
               );
             })}
           </View>
 
           {/* Footer */}
-          <View style={styles.sidebarFooter}>
-            <Text style={styles.footerText}>Notes App v1.0.0</Text>
-            <Text style={styles.footerSubtext}>Made By Mohammed.J</Text>
+          <View style={[styles.sidebarFooter, { borderTopColor: currentTheme.id === 'light' ? currentTheme.colors.border : '#374151' }]}>
+            <Text style={[styles.footerText, { color: currentTheme.colors.textSecondary }]}>Notes App v1.0.0</Text>
+            <Text style={[styles.footerSubtext, { color: currentTheme.colors.textSecondary, opacity: 0.7 }]}>Made By Mohammed.J</Text>
           </View>
         </SafeAreaView>
       </Animated.View>
@@ -161,10 +165,8 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     width: SIDEBAR_WIDTH,
-    backgroundColor: '#1F2937',
     zIndex: 999,
     borderRightWidth: 1,
-    borderRightColor: '#374151',
   },
   sidebarContent: {
     flex: 1,
@@ -176,7 +178,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   profileSection: {
     flexDirection: 'row',
@@ -195,13 +196,11 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 2,
   },
   profileEmail: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#9CA3AF',
   },
   closeButton: {
     padding: 8,
@@ -220,7 +219,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   menuItemActive: {
-    backgroundColor: '#374151',
+    // Background color will be set dynamically
   },
   menuIconContainer: {
     width: 32,
@@ -231,41 +230,40 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   menuIconContainerActive: {
-    backgroundColor: '#8B5CF620',
+    // Background color will be set dynamically
   },
   menuItemText: {
     fontSize: 16,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
     flex: 1,
+    // Color will be set dynamically
   },
   menuItemTextActive: {
-    color: '#F9FAFB',
+    // Color will be set dynamically
   },
   activeIndicator: {
     width: 3,
     height: 20,
-    backgroundColor: '#8B5CF6',
     borderRadius: 2,
     position: 'absolute',
     right: 0,
+    // Background color will be set dynamically
   },
   sidebarFooter: {
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderTopWidth: 1,
-    borderTopColor: '#374151',
     alignItems: 'center',
   },
   footerText: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
     marginBottom: 4,
+    // Color will be set dynamically
   },
   footerSubtext: {
     fontSize: 10,
     fontFamily: 'Inter-Regular',
-    color: '#6B7280',
+    // Color will be set dynamically
   },
 });

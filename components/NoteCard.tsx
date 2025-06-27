@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Pin, Calendar, MoveVertical as MoreVertical, ExternalLink, Globe } from 'lucide-react-native';
 import { Note } from '@/types/Note';
+import { useTheme } from '@/context/ThemeContext';
 
 interface NoteCardProps {
   note: Note;
@@ -20,6 +21,7 @@ const { width } = Dimensions.get('window');
 const cardWidth = (width - 48) / 2; // Account for padding and gap
 
 export default function NoteCard({ note, onPress, onPinToggle, onMore }: NoteCardProps) {
+  const { currentTheme } = useTheme();
   const formatDate = (date: Date) => {
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
@@ -56,7 +58,14 @@ export default function NoteCard({ note, onPress, onPinToggle, onMore }: NoteCar
 
   return (
     <TouchableOpacity
-      style={[styles.card, note.isPinned && styles.pinnedCard]}
+      style={[
+        styles.card,
+        {
+          backgroundColor: currentTheme.colors.surface,
+          borderColor: currentTheme.colors.border
+        },
+        note.isPinned && [styles.pinnedCard, { borderColor: currentTheme.colors.warning }]
+      ]}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -72,26 +81,26 @@ export default function NoteCard({ note, onPress, onPinToggle, onMore }: NoteCar
         
         <View style={styles.headerActions}>
           {note.isPinned && (
-            <Pin size={14} color="#F59E0B" fill="#F59E0B" />
+            <Pin size={14} color={currentTheme.colors.warning} fill={currentTheme.colors.warning} />
           )}
           <TouchableOpacity onPress={onMore} style={styles.moreButton}>
-            <MoreVertical size={16} color="#6B7280" />
+            <MoreVertical size={16} color={currentTheme.colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <Text style={styles.title} numberOfLines={2}>
+      <Text style={[styles.title, { color: currentTheme.colors.text }]} numberOfLines={2}>
         {note.title || 'Untitled Note'}
       </Text>
       
-      <Text style={styles.content} numberOfLines={6}>
+      <Text style={[styles.content, { color: currentTheme.id === 'light' ? currentTheme.colors.textSecondary : '#D1D5DB' }]} numberOfLines={6}>
         {note.content || 'No content'}
       </Text>
 
       {hasUrl && (
         <View style={styles.linkIndicator}>
-          <Globe size={12} color="#8B5CF6" />
-          <ExternalLink size={12} color="#8B5CF6" />
+          <Globe size={12} color={currentTheme.colors.accent} />
+          <ExternalLink size={12} color={currentTheme.colors.accent} />
         </View>
       )}
 
@@ -99,12 +108,12 @@ export default function NoteCard({ note, onPress, onPinToggle, onMore }: NoteCar
         {note.tags.length > 0 && (
           <View style={styles.tagsContainer}>
             {note.tags.slice(0, 1).map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>#{tag}</Text>
+              <View key={index} style={[styles.tag, { backgroundColor: currentTheme.id === 'light' ? currentTheme.colors.secondary : '#374151' }]}>
+                <Text style={[styles.tagText, { color: currentTheme.colors.textSecondary }]}>#{tag}</Text>
               </View>
             ))}
             {note.tags.length > 1 && (
-              <Text style={styles.moreTagsText}>+{note.tags.length - 1}</Text>
+              <Text style={[styles.moreTagsText, { color: currentTheme.colors.textSecondary }]}>+{note.tags.length - 1}</Text>
             )}
           </View>
         )}
@@ -115,18 +124,15 @@ export default function NoteCard({ note, onPress, onPinToggle, onMore }: NoteCar
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1F2937',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     width: cardWidth,
     borderWidth: 1,
-    borderColor: '#374151',
     minHeight: 180,
   },
   pinnedCard: {
-    borderColor: '#F59E0B',
-    backgroundColor: '#1F2937',
+    // Dynamic border color from theme
   },
   header: {
     flexDirection: 'row',
@@ -154,14 +160,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#F9FAFB',
     marginBottom: 8,
     lineHeight: 22,
   },
   content: {
     fontSize: 13,
     fontFamily: 'Inter-Regular',
-    color: '#D1D5DB',
     lineHeight: 18,
     marginBottom: 12,
     flex: 1,
@@ -183,7 +187,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   tag: {
-    backgroundColor: '#374151',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -191,11 +194,9 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
   },
   moreTagsText: {
     fontSize: 10,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
   },
 });
