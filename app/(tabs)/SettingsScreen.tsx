@@ -179,16 +179,16 @@ export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
           />
         </SettingSection>
 
-        {/* Privacy & Security Section */}
-        <SettingSection title="Privacy & Security">
+     
+  {/* Privacy & Security Section */}
+  <SettingSection title="Privacy & Security">
           <SettingItem
-            icon={<Shield size={20} color="#10B981" />}
+            icon={<Shield size={20} color={currentTheme.colors.success} />}
             title="Privacy"
             subtitle="Control your data and privacy settings"
-            onPress={() => Alert.alert('Privacy', 'Privacy settings coming soon!')}
+            onPress={() => router.push('/(tabs)/privacy' as any)}
           />
         </SettingSection>
-
         {/* Data Management Section */}
         <SettingSection title="Data Management">
           <SettingItem
@@ -214,10 +214,10 @@ export default function SettingsScreen({ onMenuPress }: SettingsScreenProps) {
         {/* About Section */}
         <SettingSection title="About">
           <SettingItem
-            icon={<Info size={20} color="#9CA3AF" />}
+            icon={<Info size={20} color={currentTheme.colors.textSecondary} />}
             title="App Info"
-            subtitle="Version 1.0.0 • Built with React Native"
-            onPress={() => Alert.alert('App Info', 'Notes App v1.0.0\nBuilt with React Native and Expo')}
+            subtitle="Version, credits, and technical details"
+            onPress={() => router.push('/(tabs)/app-info')}
           />
         </SettingSection>
 

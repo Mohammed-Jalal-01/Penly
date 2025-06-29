@@ -10,8 +10,9 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus, StickyNote, Menu, MoveHorizontal as MoreHorizontal } from 'lucide-react-native';
+import { Plus, StickyNote, Menu, MoveHorizontal as MoreHorizontal, Search } from 'lucide-react-native';
 import { useNotes } from '@/hooks/useNotes';
+import { router } from 'expo-router';
 import NoteCard from '@/components/NoteCard';
 import NoteEditor from '@/components/NoteEditor';
 import { Note } from '@/types/Note';
@@ -20,9 +21,10 @@ import { useTheme } from '@/context/ThemeContext';
 // Define props interface for screen components
 interface ScreenProps {
   onMenuPress?: () => void;
+  onNavigate?: (tab: string) => void;
 }
 
-export default function NotesScreen({ onMenuPress }: ScreenProps) {
+export default function NotesScreen({ onMenuPress, onNavigate }: ScreenProps) {
   const { currentTheme } = useTheme();
   const {
     notes,
@@ -173,7 +175,13 @@ export default function NotesScreen({ onMenuPress }: ScreenProps) {
           <Menu size={24} color={currentTheme.colors.textSecondary} />
         </TouchableOpacity>
         
-        <Text style={[styles.searchPlaceholder, { color: currentTheme.colors.textSecondary }]}>Search your notes</Text>
+        <TouchableOpacity 
+          onPress={() => onNavigate ? onNavigate('search') : null}
+          style={[styles.searchBar, { backgroundColor: currentTheme.colors.surface, borderColor: currentTheme.colors.border }]}
+        >
+          <Search size={18} color={currentTheme.colors.textSecondary} />
+          <Text style={[styles.searchPlaceholder, { color: currentTheme.colors.textSecondary }]}>Search your notes</Text>
+        </TouchableOpacity>
         
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.moreButton}>
@@ -258,11 +266,23 @@ const styles = StyleSheet.create({
   menuButton: {
     padding: 8,
   },
+  searchBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1F2937',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginLeft: 16,
+    marginRight: 16,
+    borderWidth: 1,
+  },
   searchPlaceholder: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Inter-Regular',
-    marginLeft: 16,
+    marginLeft: 8,
   },
   headerRight: {
     flexDirection: 'row',

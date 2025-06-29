@@ -10,9 +10,18 @@ import {
   Inter_700Bold
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import { ThemeProvider } from '@/context/ThemeContext';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
+
+// Component to manage status bar style based on theme
+function StatusBarManager() {
+  const { currentTheme } = useTheme();
+  // Use 'dark' for light backgrounds and 'light' for dark backgrounds
+  const statusBarStyle = currentTheme.id === 'light' ? 'dark' : 'light';
+  
+  return <StatusBar style={statusBarStyle} />
+}
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -41,7 +50,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar style="light" />
+        <StatusBarManager />
       </>
     </ThemeProvider>
   );

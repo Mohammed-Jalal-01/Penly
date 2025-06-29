@@ -69,7 +69,7 @@ export default function MainApp() {
 
     switch (activeTab) {
       case 'index':
-        return <NotesScreen {...screenProps} />;
+        return <NotesScreen {...screenProps} onNavigate={handleTabPress} />;
       case 'search':
         return <SearchScreen {...screenProps} />;
       case 'categories':
