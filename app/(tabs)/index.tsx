@@ -187,10 +187,7 @@ export default function NotesScreen({ onMenuPress, onNavigate }: ScreenProps) {
           <TouchableOpacity style={styles.moreButton}>
             <MoreHorizontal size={24} color={currentTheme.colors.textSecondary} />
           </TouchableOpacity>
-          <Image 
-            source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' }}
-            style={styles.profileImage}
-          />
+         
         </View>
       </View>
 
@@ -292,11 +289,7 @@ const styles = StyleSheet.create({
   moreButton: {
     padding: 8,
   },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
+ 
   filterContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,

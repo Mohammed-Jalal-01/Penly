@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeContext';
+import { router } from 'expo-router';
 
 interface SidebarProps {
   isVisible: boolean;
@@ -91,16 +92,35 @@ export default function Sidebar({
         <SafeAreaView style={styles.sidebarContent} edges={['top', 'bottom']}>
           {/* Header */}
           <View style={[styles.sidebarHeader, { borderBottomColor: currentTheme.id === 'light' ? currentTheme.colors.border : '#374151' }]}>
-            <View style={styles.profileSection}>
-              <Image 
-                source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' }}
+            <TouchableOpacity 
+              style={styles.profileSection}
+              onPress={() => {
+                router.push('/(tabs)/ProfileScreen' as any);
+                onClose();
+              }}
+              activeOpacity={0.7}
+            >
+             <Image
+                source={require('../assets/images/note-profile-1.jpg')}
                 style={styles.profileImage}
               />
               <View style={styles.profileInfo}>
-                <Text style={[styles.profileName, { color: currentTheme.colors.text }]}>John Doe</Text>
-                <Text style={[styles.profileEmail, { color: currentTheme.colors.textSecondary }]}>john@example.com</Text>
+                <Text 
+                  style={[styles.profileName, { color: currentTheme.colors.text }]} 
+                  numberOfLines={1} 
+                  ellipsizeMode="tail"
+                >
+                  Mohammed
+                </Text>
+                <Text 
+                  style={[styles.profileEmail, { color: currentTheme.colors.textSecondary }]} 
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  mohammed333@example.com
+                </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <X size={24} color={currentTheme.colors.textSecondary} />
@@ -183,24 +203,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0, // Ensures text truncation works properly
   },
   profileImage: {
     width: 48,
     height: 48,
     borderRadius: 24,
     marginRight: 12,
+    flexShrink: 0, // Prevents image from shrinking
   },
   profileInfo: {
     flex: 1,
+    minWidth: 0, // Ensures text truncation works properly
   },
   profileName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     marginBottom: 2,
+    flexShrink: 1, // Allows text to shrink
   },
   profileEmail: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
+    flexShrink: 1, // Allows text to shrink
   },
   closeButton: {
     padding: 8,
