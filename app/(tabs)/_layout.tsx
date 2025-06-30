@@ -6,6 +6,8 @@ export default function Layout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="search" />
       <Stack.Screen name="categories" />
+      <Stack.Screen name="archive" />
+      <Stack.Screen name="trash" />
       <Stack.Screen name="settings" />
     </Stack>
   );
