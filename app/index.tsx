@@ -14,6 +14,8 @@ import NotesScreen from '@/app/(tabs)/index';
 import SearchScreen from '@/app/(tabs)/SearchScreen';
 import SettingsScreen from '@/app/(tabs)/SettingsScreen';
 import CategoriesScreen from '@/app/(tabs)/CategoriesScreen';
+import ArchiveScreen from '@/app/(tabs)/archive';
+import TrashScreen from '@/app/(tabs)/trash';
 
 export default function MainApp() {
   const { currentTheme } = useTheme();
@@ -76,6 +78,10 @@ export default function MainApp() {
         return <CategoriesScreen {...screenProps} />;
       case 'settings':
         return <SettingsScreen {...screenProps} />;
+      case 'archive':
+        return <ArchiveScreen {...screenProps} />;
+      case 'trash':
+        return <TrashScreen {...screenProps} />;
       default:
         return <NotesScreen {...screenProps} />;
     }

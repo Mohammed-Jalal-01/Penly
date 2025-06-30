@@ -14,7 +14,9 @@ import {
   Search, 
   FolderOpen, 
   Settings,
-  X
+  X,
+  Archive,
+  Trash2
 } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { router } from 'expo-router';
@@ -42,6 +44,8 @@ export default function Sidebar({
     { id: 'index', title: 'Notes', icon: NotebookPen },
     { id: 'search', title: 'Search', icon: Search },
     { id: 'categories', title: 'Categories', icon: FolderOpen },
+    { id: 'archive', title: 'Archive', icon: Archive },
+    { id: 'trash', title: 'Trash', icon: Trash2 },
     { id: 'settings', title: 'Settings', icon: Settings },
   ];
 
